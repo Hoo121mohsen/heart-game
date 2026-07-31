@@ -1,13 +1,14 @@
 let rewardImages = [];
-let wordImages = {
-  "الله": "",
-  "الحی": ""
-};
+let wordImages = { "الله": "", "الحی": "" };
 let targetWord = "";
 const words = ["الله", "الحی"];
 let isGuessLocked = false;
 
-// بارگذاری داده‌ها از LocalStorage
+// متغیرهای مربوط به حرکت دایره سیاه
+let dotPos = { x: 0, y: 0 };
+let dotVel = { x: 2, y: 1.5 };
+let animFrameId = null;
+
 window.onload = function() {
   const savedRewards = localStorage.getItem('game_rewards');
   if (savedRewards) rewardImages = JSON.parse(savedRewards);
@@ -21,13 +22,11 @@ window.onload = function() {
   resetGame();
 };
 
-// پنل تنظیمات
 document.getElementById('toggleSettings').addEventListener('click', function() {
-  const panel = document.getElementById('settingsPanel');
-  panel.classList.toggle('hidden');
+  document.getElementById('settingsPanel').classList.toggle('hidden');
 });
 
-// آپلود عکس ۱۰ تایی جایزه
+// مدیریت آپلودها
 document.getElementById('imageInput').addEventListener('change', function(e) {
   const files = Array.from(e.target.files).slice(0, 10);
   rewardImages = [];
@@ -44,7 +43,6 @@ document.getElementById('imageInput').addEventListener('change', function(e) {
   });
 });
 
-// آپلود عکس الله
 document.getElementById('allahInput').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (file) {
@@ -58,7 +56,6 @@ document.getElementById('allahInput').addEventListener('change', function(e) {
   }
 });
 
-// آپلود عکس الحی
 document.getElementById('alhaiInput').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (file) {
@@ -78,7 +75,23 @@ function showStatus(text) {
   setTimeout(() => status.innerText = "", 3000);
 }
 
-// شروع/ریست بازی
+// انیمیشن حرکت دایره داخل قلب
+function moveDot() {
+  const dot = document.getElementById('blackDot');
+  
+  // محدود کردن حرکت درون قلب
+  dotPos.x += dotVel.x;
+  dotPos.y += dotVel.y;
+
+  if (dotPos.x < 10 || dotPos.x > 120) dotVel.x *= -1;
+  if (dotPos.y < 10 || dotPos.y > 120) dotVel.y *= -1;
+
+  dot.style.left = dotPos.x + 'px';
+  dot.style.top = dotPos.y + 'px';
+
+  animFrameId = requestAnimationFrame(moveDot);
+}
+
 function resetGame() {
   targetWord = words[Math.floor(Math.random() * words.length)];
   isGuessLocked = false;
@@ -88,40 +101,65 @@ function resetGame() {
   const resetBtn = document.getElementById('resetBtn');
 
   heart.classList.remove('fade-out');
-  heart.classList.add('beating');
   rewardContainer.classList.add('hidden');
   resetBtn.classList.add('hidden');
   document.getElementById('message').innerText = "";
+
+  // شروع مجدد انیمیشن حرکت دایره
+  dotPos = { x: 10, y: 10 };
+  dotVel = { x: 2.5, y: 1.8 };
+  if (animFrameId) cancelAnimationFrame(animFrameId);
+  moveDot();
 }
 
-// حدس زدن
+// بررسی اینکه آیا دایره سیاه داخل حفره قرار دارد یا خیر
+function isDotInHole() {
+  // مرکز حفره در (67, 67) و شعاع آن 25px است
+  // مرکز دایره در (dotPos.x + 13, dotPos.y + 13) قرار دارد
+  const dotCenterX = dotPos.x + 13;
+  const dotCenterY = dotPos.y + 13;
+  const holeCenterX = 80;
+  const holeCenterY = 80;
+
+  const distance = Math.sqrt(
+    Math.pow(dotCenterX - holeCenterX, 2) + Math.pow(dotCenterY - holeCenterY, 2)
+  );
+
+  return distance <= 18; // اگر فاصله مرکز دایره تا حفره کمتر از ۱۸ پیکسل باشد یعنی کاملا وارد شده
+}
+
 function makeGuess(guessedWord) {
   if (isGuessLocked) return;
 
   const message = document.getElementById('message');
 
+  // ۱. اول بررسی می‌کنیم دایره داخل حفره هست یا نه
+  if (!isDotInHole()) {
+    message.style.color = "#ff9500";
+    message.innerText = "هنوز زوده حدس بزنی! ⏳";
+    return;
+  }
+
+  // ۲. اگر داخل حفره بود، حدس کاربر بررسی می‌شود
   if (guessedWord === targetWord) {
     isGuessLocked = true;
+    if (animFrameId) cancelAnimationFrame(animFrameId); // متوقف شدن دایره سیاه
+
     message.style.color = "#34c759";
     message.innerText = "آفرین! درست حدس زدی 🎉";
 
     const heart = document.getElementById('heart');
-    
-    // ۱. محو شدن تدریجی طی ۵ ثانیه
-    heart.classList.remove('beating'); // متوقف شدن تپش موقع محو شدن
     heart.classList.add('fade-out');
 
-    // ۲. نمایش تصویر کلمه یا جایزه بعد از ۵ ثانیه
+    // محو شدن طی ۱۰ ثانیه (10000 میلی‌ثانیه)
     setTimeout(() => {
       const rewardContainer = document.getElementById('rewardContainer');
       const rewardImg = document.getElementById('rewardImage');
 
-      // اگر برای کلمه حدس زده شده عکس آپلود شده باشد، ابتدا آن را نشان می‌دهد
       if (wordImages[targetWord]) {
         rewardImg.src = wordImages[targetWord];
         rewardContainer.classList.remove('hidden');
 
-        // بعد از ۲ ثانیه، یکی از ۱۰ عکس جایزه را نشان می‌دهد
         setTimeout(() => {
           if (rewardImages.length > 0) {
             const randomReward = rewardImages[Math.floor(Math.random() * rewardImages.length)];
@@ -130,19 +168,17 @@ function makeGuess(guessedWord) {
         }, 2000);
 
       } else if (rewardImages.length > 0) {
-        // اگر عکس کلمه نبود مستقیم یکی از ۱۰ عکس جایزه
         const randomReward = rewardImages[Math.floor(Math.random() * rewardImages.length)];
         rewardImg.src = randomReward;
         rewardContainer.classList.remove('hidden');
       }
 
-      // نمایش دکمه بازی مجدد
       document.getElementById('resetBtn').classList.remove('hidden');
 
-    }, 5000); // زمان ۵ ثانیه برای محو شدن کامل
+    }, 10000);
 
   } else {
     message.style.color = "#ff3b30";
-    message.innerText = "اشتباه بود! دوباره حدس بزن ❌";
+    message.innerText = "اشتباه بود! دوباره سعی کن ❌";
   }
 }
