@@ -9,10 +9,8 @@
 <body>
 
   <div class="container">
-    <!-- دکمه باز و بستن تنظیمات -->
     <button id="toggleSettings" class="btn-settings">⚙️ تنظیمات تصاویر</button>
 
-    <!-- بخش تنظیمات (در حالت عادی مخفی است) -->
     <div id="settingsPanel" class="settings-panel hidden">
       <h3>تنظیمات بازی</h3>
       
@@ -34,25 +32,28 @@
       <p id="uploadStatus" class="status-text"></p>
     </div>
 
-    <!-- بخش اصلی بازی -->
     <div class="game-section">
-      <h2 class="instruction">پشت قلب کدام کلمه است؟ حدس بزنید!</h2>
+      <h3 class="instruction">وقتی دایره سیاه وارد حفره شد حدس بزنید!</h3>
 
-      <div class="options">
-        <button class="btn-choice" onclick="makeGuess('الله')">الله</button>
-        <button class="btn-choice" onclick="makeGuess('الحی')">الحی</button>
-      </div>
-
+      <!-- ساختار قلب با حفره و دایره متحرک -->
       <div class="heart-box">
-        <div id="heart" class="heart beating">❤️</div>
+        <div id="heart" class="heart-shape">
+          <div id="hole" class="hole"></div>
+          <div id="blackDot" class="black-dot"></div>
+        </div>
         <div id="rewardContainer" class="reward-container hidden">
           <img id="rewardImage" src="" alt="تصویر">
         </div>
       </div>
 
+      <!-- دکمه‌های حدس زدن (زیر قلب) -->
+      <div class="options">
+        <button class="btn-choice" onclick="makeGuess('الله')">الله</button>
+        <button class="btn-choice" onclick="makeGuess('الحی')">الحی</button>
+      </div>
+
       <p id="message" class="message"></p>
 
-      <!-- دکمه شروع مجدد -->
       <button id="resetBtn" class="btn-reset hidden" onclick="resetGame()">بازی مجدد 🔄</button>
     </div>
   </div>
