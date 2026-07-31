@@ -4,9 +4,9 @@ let targetWord = "";
 const words = ["الله", "الحی"];
 let isGuessLocked = false;
 
-// متغیرهای مربوط به حرکت دایره سیاه
-let dotPos = { x: 0, y: 0 };
-let dotVel = { x: 2, y: 1.5 };
+// سرعت حرکت بسیار آرام و کند تنظیم شد (0.4 و 0.3)
+let dotPos = { x: 10, y: 10 };
+let dotVel = { x: 0.4, y: 0.3 };
 let animFrameId = null;
 
 window.onload = function() {
@@ -26,7 +26,6 @@ document.getElementById('toggleSettings').addEventListener('click', function() {
   document.getElementById('settingsPanel').classList.toggle('hidden');
 });
 
-// مدیریت آپلودها
 document.getElementById('imageInput').addEventListener('change', function(e) {
   const files = Array.from(e.target.files).slice(0, 10);
   rewardImages = [];
@@ -75,16 +74,14 @@ function showStatus(text) {
   setTimeout(() => status.innerText = "", 3000);
 }
 
-// انیمیشن حرکت دایره داخل قلب
 function moveDot() {
   const dot = document.getElementById('blackDot');
   
-  // محدود کردن حرکت درون قلب
   dotPos.x += dotVel.x;
   dotPos.y += dotVel.y;
 
-  if (dotPos.x < 10 || dotPos.x > 120) dotVel.x *= -1;
-  if (dotPos.y < 10 || dotPos.y > 120) dotVel.y *= -1;
+  if (dotPos.x < 10 || dotPos.x > 125) dotVel.x *= -1;
+  if (dotPos.y < 10 || dotPos.y > 125) dotVel.y *= -1;
 
   dot.style.left = dotPos.x + 'px';
   dot.style.top = dotPos.y + 'px';
@@ -105,19 +102,15 @@ function resetGame() {
   resetBtn.classList.add('hidden');
   document.getElementById('message').innerText = "";
 
-  // شروع مجدد انیمیشن حرکت دایره
   dotPos = { x: 10, y: 10 };
-  dotVel = { x: 2.5, y: 1.8 };
+  dotVel = { x: 0.4, y: 0.3 };
   if (animFrameId) cancelAnimationFrame(animFrameId);
   moveDot();
 }
 
-// بررسی اینکه آیا دایره سیاه داخل حفره قرار دارد یا خیر
 function isDotInHole() {
-  // مرکز حفره در (67, 67) و شعاع آن 25px است
-  // مرکز دایره در (dotPos.x + 13, dotPos.y + 13) قرار دارد
-  const dotCenterX = dotPos.x + 13;
-  const dotCenterY = dotPos.y + 13;
+  const dotCenterX = dotPos.x + 11;
+  const dotCenterY = dotPos.y + 11;
   const holeCenterX = 80;
   const holeCenterY = 80;
 
@@ -125,7 +118,7 @@ function isDotInHole() {
     Math.pow(dotCenterX - holeCenterX, 2) + Math.pow(dotCenterY - holeCenterY, 2)
   );
 
-  return distance <= 18; // اگر فاصله مرکز دایره تا حفره کمتر از ۱۸ پیکسل باشد یعنی کاملا وارد شده
+  return distance <= 18;
 }
 
 function makeGuess(guessedWord) {
@@ -133,17 +126,15 @@ function makeGuess(guessedWord) {
 
   const message = document.getElementById('message');
 
-  // ۱. اول بررسی می‌کنیم دایره داخل حفره هست یا نه
   if (!isDotInHole()) {
     message.style.color = "#ff9500";
     message.innerText = "هنوز زوده حدس بزنی! ⏳";
     return;
   }
 
-  // ۲. اگر داخل حفره بود، حدس کاربر بررسی می‌شود
   if (guessedWord === targetWord) {
     isGuessLocked = true;
-    if (animFrameId) cancelAnimationFrame(animFrameId); // متوقف شدن دایره سیاه
+    if (animFrameId) cancelAnimationFrame(animFrameId);
 
     message.style.color = "#34c759";
     message.innerText = "آفرین! درست حدس زدی 🎉";
@@ -151,7 +142,6 @@ function makeGuess(guessedWord) {
     const heart = document.getElementById('heart');
     heart.classList.add('fade-out');
 
-    // محو شدن طی ۱۰ ثانیه (10000 میلی‌ثانیه)
     setTimeout(() => {
       const rewardContainer = document.getElementById('rewardContainer');
       const rewardImg = document.getElementById('rewardImage');
