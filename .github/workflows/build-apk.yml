@@ -25,13 +25,33 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Install Capacitor & Build App
+      - name: Organize Web Files
+        run: |
+          mkdir www
+          cp index.html style.css script.js www/
+
+      - name: Install Capacitor & Prepare Project
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init HeartGame com.example.heartgame --web-dir .
+          
+          # ساخت فایل کانفیگ کاپاسیتور
+          cat <<EOF > capacitor.config.json
+          {
+            "appId": "com.example.heartgame",
+            "appName": "HeartGame",
+            "webDir": "www",
+            "bundledWebRuntime": false
+          }
+          EOF
+
           npx cap add android
-          npx cap sync android
+
+          # ساخت فایل‌های مورد نیاز اندروید که کپاسیتیور برای ایجادشون خطای sync میده
+          mkdir -p android/app/src/main/assets
+          echo "[]" > android/app/src/main/assets/capacitor.plugins.json
+
+          npx cap copy android
 
       - name: Build APK with Gradle
         run: |
