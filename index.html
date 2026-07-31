@@ -9,22 +9,34 @@
 <body>
 
   <div class="container">
-    <h2>بازی حدس تصویر</h2>
-    
-    <!-- بخش آپلود تصاویر -->
-    <div class="upload-section">
-      <label class="btn-upload">
-        انتخاب تصاویر از گالری (حداکثر ۱۰ عکس)
+    <!-- دکمه باز و بستن تنظیمات -->
+    <button id="toggleSettings" class="btn-settings">⚙️ تنظیمات تصاویر</button>
+
+    <!-- بخش تنظیمات (در حالت عادی مخفی است) -->
+    <div id="settingsPanel" class="settings-panel hidden">
+      <h3>تنظیمات بازی</h3>
+      
+      <div class="upload-group">
+        <label>عکس کلمه «الله»:</label>
+        <input type="file" id="allahInput" accept="image/*">
+      </div>
+
+      <div class="upload-group">
+        <label>عکس کلمه «الحی»:</label>
+        <input type="file" id="alhaiInput" accept="image/*">
+      </div>
+
+      <div class="upload-group">
+        <label>۱۰ عکس جایزه از گالری:</label>
         <input type="file" id="imageInput" accept="image/*" multiple>
-      </label>
-      <div id="gallery" class="gallery"></div>
+      </div>
+
+      <p id="uploadStatus" class="status-text"></p>
     </div>
 
-    <hr>
-
-    <!-- بخش بازی -->
+    <!-- بخش اصلی بازی -->
     <div class="game-section">
-      <p class="instruction">پشت قلب کدام کلمه است؟ حدس بزنید!</p>
+      <h2 class="instruction">پشت قلب کدام کلمه است؟ حدس بزنید!</h2>
 
       <div class="options">
         <button class="btn-choice" onclick="makeGuess('الله')">الله</button>
@@ -32,17 +44,19 @@
       </div>
 
       <div class="heart-box">
-        <div id="heart" class="heart">❤️</div>
+        <div id="heart" class="heart beating">❤️</div>
         <div id="rewardContainer" class="reward-container hidden">
-          <img id="rewardImage" src="" alt="جایزه">
+          <img id="rewardImage" src="" alt="تصویر">
         </div>
       </div>
 
       <p id="message" class="message"></p>
+
+      <!-- دکمه شروع مجدد -->
+      <button id="resetBtn" class="btn-reset hidden" onclick="resetGame()">بازی مجدد 🔄</button>
     </div>
   </div>
 
   <script src="script.js"></script>
 </body>
 </html>
-
