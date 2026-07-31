@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بازی حدس قلب</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h2>بازی حدس تصویر</h2>
+    
+    <!-- بخش آپلود تصاویر -->
+    <div class="upload-section">
+      <label class="btn-upload">
+        انتخاب تصاویر از گالری (حداکثر ۱۰ عکس)
+        <input type="file" id="imageInput" accept="image/*" multiple>
+      </label>
+      <div id="gallery" class="gallery"></div>
+    </div>
+
+    <hr>
+
+    <!-- بخش بازی -->
+    <div class="game-section">
+      <p class="instruction">پشت قلب کدام کلمه است؟ حدس بزنید!</p>
+
+      <div class="options">
+        <button class="btn-choice" onclick="makeGuess('الله')">الله</button>
+        <button class="btn-choice" onclick="makeGuess('الحی')">الحی</button>
+      </div>
+
+      <div class="heart-box">
+        <div id="heart" class="heart">❤️</div>
+        <div id="rewardContainer" class="reward-container hidden">
+          <img id="rewardImage" src="" alt="جایزه">
+        </div>
+      </div>
+
+      <p id="message" class="message"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
